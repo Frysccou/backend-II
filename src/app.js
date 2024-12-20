@@ -1,8 +1,8 @@
-const express = require('express');
-const cookieParser = require('cookie-parser');
-const passport = require('./config/passport');
-const sessionsRouter = require('./routes/sessions.router');
-const mongooseConnection = require('./config/mongo');
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import passport from 'passport';
+import sessionsRouter from './routes/sessions.router.js';
+import './config/mongo.js';
 
 const app = express();
 
@@ -14,4 +14,4 @@ app.use(passport.initialize());
 // Rutas
 app.use('/api/sessions', sessionsRouter);
 
-module.exports = app;
+export default app;

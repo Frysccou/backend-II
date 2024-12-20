@@ -1,7 +1,8 @@
-const express = require('express');
-const { login, register } = require('../controllers/sessions.controller');
+import express from 'express';
+import { login, register } from '../controllers/sessions.controller.js';
+import passport from 'passport';
+
 const router = express.Router();
-const passport = require('passport');
 
 // Ruta de login
 router.post('/login', login);
@@ -17,4 +18,4 @@ router.get('/current', passport.authenticate('jwt', { session: false }), (req, r
   res.json({ user: req.user });
 });
 
-module.exports = router;
+export default router;
