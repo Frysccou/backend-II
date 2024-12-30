@@ -1,10 +1,16 @@
 import passport from 'passport';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
-import User from '../models/User.js';
+import User from '../dao/models/user.model.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const opts = {
-  jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor, ExtractJwt.fromAuthHeaderAsBearerToken()]),
-  secretOrKey: 'queonda',
+  jwtFromRequest: ExtractJwt.fromExtractors([
+    cookieExtractor,
+    ExtractJwt.fromAuthHeaderAsBearerToken()
+  ]),
+  secretOrKey: process.env.JWT_SECRET,
 };
 
 function cookieExtractor(req) {

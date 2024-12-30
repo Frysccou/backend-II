@@ -2,20 +2,20 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
 const userSchema = new mongoose.Schema({
-  first_name: { type: String, required: true },
-  last_name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  age: { type: Number, required: true },
-  password: { type: String, required: true },
+  first_name: String,
+  last_name: String,
+  email: {type: String, unique: true},
+  age: Number,
+  password: String,
+  role: {type: String, default: 'user'},
   cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' },
-  role: { type: String, default: 'user' },
-});
+})
 
 // Middleware para encriptar la contraseña antes de guardar
 userSchema.pre('save', function (next) {
   if (!this.isModified('password')) return next();
   try {
-    // Encriptar la contraseña de manera sincrónica
+    // Encriptar la contraseña de manera sincronica
     this.password = bcrypt.hashSync(this.password, 10); // Encripta la contraseña de forma sincr..
     next();
   } catch (error) {

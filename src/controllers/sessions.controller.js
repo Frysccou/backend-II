@@ -1,46 +1,81 @@
 import bcrypt from 'bcrypt';
-import User from '../models/user.model.js';
+import dotenv from 'dotenv';
+import UserRepository from '../dao/repositories/user.repository.js';
+import CartDAO from '../dao/daos/cart.dao.js';
 import { generateToken } from '../utils/token.js';
+import { UserDTO } from '../dtos/user.dto.js';
+
+dotenv.config();
 
 // Controlador para el login
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Buscar al usuario por email
-    const user = await User.findOne({ email });
+    const user = await UserRepository.findByEmail(email);
 
-    // Verificar si el usuario existe
     if (!user) {
       return res.status(400).send('Usuario no encontrado');
     }
 
-    // Comparar la contraseña ingresada con la almacenada
     const isMatch = bcrypt.compare(password, user.password);
 
-    // Si no coinciden, dar error
     if (!isMatch) {
       return res.status(400).send('Contraseña incorrecta');
     }
 
-    // Crear el payload para el JWT
     const payload = { _id: user._id };
-
-    // Generar el token JWT usando la función de utilidades
     const token = generateToken(payload);
 
-    // Establecer el token en la cookie
     res.cookie('jwt', token, { 
       httpOnly: true, 
       secure: process.env.NODE_ENV === 'production',
       maxAge: 3600000 // 1 hora
     });
 
-    // Responder con el token en el cuerpo de la respuesta
     res.json({ token, message: 'Login exitoso' });
 
   } catch (err) {
     console.error('Error en login:', err);
     res.status(500).send('Error en el servidor');
   }
+};
+
+// Controlador para registrar usuario
+export const register = async (req, res) => {
+  const { first_name, last_name, email, age, password } = req.body;
+
+  try {
+    const existingUser = await UserRepository.findByEmail(email);
+    if (existingUser) {
+      return res.status(400).send('El email ya esta registrado');
+    }
+
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    const newUser = await UserRepository.create({
+      first_name,
+      last_name,
+      email,
+      age,
+      password: hashedPassword,
+    });
+
+    // Crear un carrito para el usuario recién registrado
+    const newCart = await CartDAO.create({ userId: newUser._id, products: [] });
+
+    // Asignar el carrito al usuario
+    newUser.cart = newCart._id;
+    await newUser.save();
+
+    res.status(201).send('Usuario registrado exitosamente');
+  } catch (err) {
+    console.error('Error al registrar usuario:', err);
+    res.status(500).send('Error al registrar usuario');
+  }
+};
+
+// Controlador para obtener el usuario actual
+export const getCurrentUser = (req, res) => {
+  const userDTO = new UserDTO(req.user);
+  res.json(userDTO);
 };

@@ -1,5 +1,5 @@
 import express from 'express';
-import { login, register } from '../controllers/sessions.controller.js';
+import { login, register, getCurrentUser } from '../controllers/sessions.controller.js';
 import passport from 'passport';
 
 const router = express.Router();
@@ -10,12 +10,7 @@ router.post('/login', login);
 // Ruta de registro
 router.post('/register', register);
 
-// Ruta para tener los detalles del usuario actual
-router.get('/current', passport.authenticate('jwt', { session: false }), (req, res) => {
-  if (!req.user) {
-    return res.status(401).send('No autenticado');
-  }
-  res.json({ user: req.user });
-});
+// Ruta para obtener el usuario actual
+router.get('/current', passport.authenticate('jwt', { session: false }), getCurrentUser);
 
 export default router;
