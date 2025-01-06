@@ -43,7 +43,7 @@ export const login = async (req, res) => {
 
 // Controlador para registrar usuario
 export const register = async (req, res) => {
-  const { first_name, last_name, email, age, password } = req.body;
+  const { first_name, last_name, email, age, password, role } = req.body;
 
   try {
     const existingUser = await UserRepository.findByEmail(email);
@@ -58,6 +58,7 @@ export const register = async (req, res) => {
       email,
       age,
       password: hashedPassword,
+      role: role || 'user' // Asignar rol, por defecto es un user, pero generalmente al crear, se elige
     });
 
     // Crear un carrito para el usuario recién registrado
