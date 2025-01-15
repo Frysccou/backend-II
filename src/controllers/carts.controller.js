@@ -19,6 +19,10 @@ export const getCurrentCart = async (req, res) => {
 export const addToCart = async (req, res) => {
   const { productId, quantity } = req.body;
   try {
+    if (!req.user.cart) {
+      return res.status(400).send('Carrito no asignado al usuario');
+    }
+
     const cart = await CartDAO.findById(req.user.cart);
     const product = await ProductDAO.findById(productId);
 

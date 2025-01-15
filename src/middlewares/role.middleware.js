@@ -1,6 +1,6 @@
-export const ensureRole = (role) => (req, res, next) => {
-  if (req.user.role !== role) {
-    return res.status(403).send({ message: 'Acceso denegado' });
+export const ensureRole = (...roles) => (req, res, next) => {
+  if (req.user && (req.user.role === 'admin' || roles.include(req.user.role))) {
+    return next();
   }
-  next();
+  return res.status(403).send({message: 'Acceso denegado'});
 };

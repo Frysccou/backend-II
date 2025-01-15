@@ -5,13 +5,7 @@ import sessionsRouter from './routes/sessions.router.js';
 import productsRouter from './routes/products.router.js';
 import cartsRouter from './routes/carts.router.js';
 import './config/mongo.js';
-
-try {
-    await import('./config/passport.js');
-    console.log('Passport esta bien configurado....');
-} catch (error) {
-    console.error('Error al configurar passport:', error);
-} // Por las dudas lo dejo, porque me surgieron problemitas con esto
+import './config/passport.js';
 
 const app = express();
 
@@ -24,5 +18,10 @@ app.use(passport.initialize());
 app.use('/api/sessions', sessionsRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
+
+const PORT = 8080;
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en el puerto: ${PORT}`);
+});
 
 export default app;

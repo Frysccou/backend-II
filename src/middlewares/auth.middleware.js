@@ -1,6 +1,11 @@
-export const ensureRole = (role) => (req, res, next) => {
-  if (req.user.role !== role) {
-    return res.status(403).send({ message: 'Acceso denegado' });
-  }
-  next();
-};
+import passport from 'passport';
+
+export const authenticate = (req, res, next) => {
+  passport.authenticate('jwt', {session: false }, (err, user, info) => {
+    if (err || !user) {
+      return res.status(401).send({ message: 'No autorizado'});
+    }
+    req.user = user;
+    next();
+  })(req, res, next);
+}
